@@ -11,7 +11,10 @@
       "test": "node node_modules/jest/bin/jest.js --config jest.config.js",
       "test:watch": "node node_modules/jest/bin/jest.js --watch",
       "test:coverage": "node node_modules/jest/bin/jest.js --coverage",
-      "example": "node examples/basic.js"
+      "example": "node examples/basic-bot.js",
+      "prepublishOnly": "npm run test",
+      "version": "git add -A",
+      "postversion": "git push && git push --tags"
     },
     "keywords": [
       "telegram",
