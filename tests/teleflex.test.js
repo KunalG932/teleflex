@@ -165,7 +165,8 @@ describe('TeleFlex', () => {
     
     const result = teleflex.setupHandlers();
     
-    expect(bot.action).toHaveBeenCalledTimes(3);
+    // Updated to 5 action handlers to account for the new 'back:start' and 'show:help' handlers
+    expect(bot.action).toHaveBeenCalledTimes(5);
     expect(bot.command).toHaveBeenCalledTimes(1);
     expect(result).toBe(teleflex); // Should return this for chaining
   });
