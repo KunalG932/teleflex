@@ -44,7 +44,7 @@ describe('TeleFlex Module Help', () => {
       reply: jest.fn().mockResolvedValue({}),
       replyWithMarkdown: jest.fn().mockResolvedValue({}),
       replyWithHTML: jest.fn().mockResolvedValue({}),
-      editMessageText: jest.fn().mockResolvedValue({}),
+      editMessageText: jest.fn().mockImplementation((text, options) => Promise.resolve({})),
       answerCbQuery: jest.fn().mockResolvedValue({}),
       callbackQuery: {
         from: { id: 123 }
@@ -53,6 +53,16 @@ describe('TeleFlex Module Help', () => {
   });
   
   test('should show module help', async () => {
+    // Setup proper mock for the specific test
+    const { Markup } = require('telegraf');
+    const mockKeyboard = {
+      reply_markup: {
+        inline_keyboard: [[{ text: '◀️ Back', callback_data: 'back:help' }]]
+      }
+    };
+    
+    Markup.inlineKeyboard.mockReturnValueOnce(mockKeyboard);
+    
     await teleflex.showModuleHelp(ctx, 'Module1');
     
     expect(ctx.editMessageText).toHaveBeenCalled();
@@ -60,7 +70,7 @@ describe('TeleFlex Module Help', () => {
     expect(messageArg).toContain('Module1 Commands');
     expect(messageArg).toContain('Help text for module 1');
     
-    // Check that back button is present
+    // Verify the mock keyboard was used
     const options = ctx.editMessageText.mock.calls[0][1];
     expect(options.reply_markup).toBeDefined();
     expect(options.reply_markup.inline_keyboard).toBeDefined();

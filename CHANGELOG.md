@@ -2,6 +2,18 @@
 
 All notable changes to the "teleflex" package will be documented in this file.
 
+## [2.0.2] - 2025-05-06
+
+### Added
+- Start message with customizable buttons in a grid format
+- "Back to Start" button in help menu for easier navigation
+- Support for URL and callback buttons in start messages
+- Enhanced navigation between help menu and start message
+
+### Changed
+- Improved start message handling with more flexibility
+- Better message state management for navigation
+
 ## [2.0.1] - 2025-05-04
 
 ### Added

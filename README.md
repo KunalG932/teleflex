@@ -12,7 +12,8 @@ A flexible Telegraf helper library for creating dynamic help menus and module ma
 - 🎨 Fully customizable texts and appearance
 - 🎭 Multiple themes (default, modern, minimal)
 - ⌨️ Dynamic inline keyboards with customizable layouts
-- 🔄 Easy navigation between modules
+- 🔄 Easy navigation between modules and start message
+- 🔘 Grid layout for buttons in customizable formats
 - 📦 TypeScript support
 - 🛡️ Built-in flood control
 - 🔄 Smart message update handling
@@ -211,6 +212,65 @@ Or switch themes at runtime:
 teleflex.setTheme('minimal');
 ```
 
+## Start Message with Buttons
+
+TeleFlex supports rich start messages with custom button layouts:
+
+```javascript
+// Make the TeleFlex instance available in context
+bot.use((ctx, next) => {
+  ctx.teleflex = teleflex;
+  return next();
+});
+
+// In your start command handler
+bot.command('start', (ctx) => {
+  // Define buttons in a grid format
+  const buttons = [
+    { text: 'Website', url: 'https://github.com' },
+    { text: 'Telegram', url: 'https://telegram.org' },
+    { text: 'Support', callback_data: 'support:contact' },
+    { text: 'About', callback_data: 'about:info' }
+  ];
+
+  // Send a start message with buttons and help button
+  ctx.teleflex.sendStartMessage(
+    ctx, 
+    'Welcome to the TeleFlex Example Bot!',
+    {
+      buttons: buttons,
+      columns: 2,       // Two buttons per row
+      includeHelp: true // Add help button at the bottom
+    }
+  );
+});
+```
+
+### Start Message Options
+
+The `sendStartMessage` method accepts these options:
+
+```javascript
+{
+  buttons: [],        // Array of button configs
+  columns: 2,         // Number of buttons per row
+  includeHelp: true   // Whether to add help button
+}
+```
+
+Button configurations can be:
+- URL buttons: `{ text: 'Label', url: 'https://example.com' }`
+- Callback buttons: `{ text: 'Label', callback_data: 'action:data' }`
+
+## Enhanced Navigation
+
+TeleFlex now provides improved navigation with "Back to Start" buttons:
+
+```javascript
+// The Help menu and Module info pages now include "Back to Start" 
+// buttons that return users to your welcome message
+```
+
 ## API Reference
 
 ### TeleFlex Class
@@ -229,6 +289,9 @@ new TeleFlex(bot, options)
 - `unregisterModule(moduleName)` - Remove a registered module
 - `onModuleSelect(moduleName, callback)` - Register a callback for when a module is selected
 - `setTheme(themeName)` - Change the active theme
+- `createStartMessage(message, options)` - Create a formatted start message with buttons
+- `sendStartMessage(ctx, message, options)` - Send a start message with buttons
+- `backToStart(ctx)` - Return to the most recent start message
 
 ## Complete Example
 
