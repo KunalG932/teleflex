@@ -2,8 +2,6 @@
 
 <div align="center">
 
-![Teleflex Logo](https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=300)
-
 A flexible Telegraf helper library for creating dynamic help menus and module management for Telegram bots.
 
 [![npm version](https://img.shields.io/npm/v/teleflex.svg)](https://www.npmjs.com/package/teleflex)
