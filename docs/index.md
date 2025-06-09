@@ -19,11 +19,14 @@ A flexible Telegraf helper library for creating dynamic help menus and module ma
   - [Help Menu](#help-menu)
   - [Themes](#themes)
   - [Navigation](#navigation)
+  - [Web App Support](#web-app-support)
+  - [Session Management](#session-management)
 - [Advanced Usage](#advanced-usage)
   - [Custom Callbacks](#custom-callbacks)
   - [Start Messages](#start-messages)
   - [Button Layouts](#button-layouts)
   - [Error Handling](#error-handling)
+  - [Message Helpers](#message-helpers)
 - [Configuration](#configuration)
 - [Best Practices](#best-practices)
 - [API Reference](#api-reference)
@@ -43,6 +46,9 @@ A flexible Telegraf helper library for creating dynamic help menus and module ma
 - 🔄 **Message Management**: Smart message update handling
 - 🚦 **Rate Limiting**: Button click throttling
 - 🔌 **Custom Callbacks**: Module-specific action handlers
+- 🌐 **Web App Support**: Integrated Telegram Web App functionality
+- 🔄 **Session Management**: Built-in user session handling
+- 💬 **Message Helpers**: Success, Error, and Info message templates
 
 ## Installation
 
@@ -61,11 +67,13 @@ const TeleFlex = require('teleflex');
 // Initialize your bot
 const bot = new Telegraf('YOUR_BOT_TOKEN');
 
-// Initialize TeleFlex
+// Initialize TeleFlex with new features
 const teleflex = new TeleFlex(bot, {
   modulesPath: './modules',
   buttonsPerPage: 6,
-  theme: 'modern'
+  theme: 'modern',
+  enableSession: true,
+  enableWebApp: true
 });
 
 // Set up the help command
@@ -128,12 +136,18 @@ const customTheme = {
     back: '🔙',
     prev: '◀️',
     next: '▶️',
-    warning: '⚠️'
+    warning: '⚠️',
+    success: '✨',
+    error: '💥',
+    info: '💡'
   },
   style: {
     title: '*{text}*',
     highlight: '_{text}_',
-    code: '```{text}```'
+    code: '```{text}```',
+    inlineCode: '`{text}`',
+    bold: '*{text}*',
+    italic: '_{text}_'
   }
 };
 
@@ -158,7 +172,66 @@ teleflex.showModuleHelp(ctx, 'Weather');
 teleflex.backToStart(ctx);
 ```
 
+### Web App Support
+
+Create and manage Web App buttons:
+
+```javascript
+// Create a Web App button
+const webAppButton = teleflex.createWebAppButton('Open App', 'https://your-app.com');
+
+// Create a keyboard with Web App button
+const keyboard = teleflex.createInlineKeyboard([
+  webAppButton,
+  { text: 'Back', callback_data: 'back' }
+]);
+
+// Handle Web App data
+bot.on('web_app_data', async (ctx) => {
+  const data = ctx.update.message.web_app_data.data;
+  try {
+    const parsedData = JSON.parse(data);
+    await teleflex.sendSuccess(ctx, 'Data received!');
+  } catch (error) {
+    await teleflex.sendError(ctx, 'Invalid data format');
+  }
+});
+```
+
+### Session Management
+
+Manage user sessions with built-in support:
+
+```javascript
+// Enable session support
+const teleflex = new TeleFlex(bot, {
+  enableSession: true
+});
+
+// Use session in commands
+bot.command('setname', async (ctx) => {
+  const name = ctx.message.text.split(' ')[1];
+  ctx.session.userData = { name };
+  await teleflex.sendSuccess(ctx, `Name set to: ${name}`);
+});
+```
+
 ## Advanced Usage
+
+### Message Helpers
+
+Use built-in message helpers for consistent formatting:
+
+```javascript
+// Success message
+await teleflex.sendSuccess(ctx, 'Operation completed!');
+
+// Error message
+await teleflex.sendError(ctx, 'Something went wrong!');
+
+// Info message
+await teleflex.sendInfo(ctx, 'Here is some information');
+```
 
 ### Custom Callbacks
 
@@ -222,6 +295,11 @@ const options = {
   theme: 'modern',
   parseMode: 'Markdown',
 
+  // New features
+  enableSession: true,
+  enableWebApp: true,
+  enableInlineMode: true,
+
   // Variable names in modules
   helpVar: 'HELP',
   moduleVar: 'MODULE',
@@ -236,7 +314,10 @@ const options = {
     helpMenuIntro: 'Available modules ({count}):\n{modules}',
     moduleHelpTitle: '🔍 {moduleName} Commands',
     backButton: '◀️ Back',
-    floodMessage: '⚠️ Please wait'
+    floodMessage: '⚠️ Please wait',
+    successMessage: '✨ {message}',
+    errorMessage: '💥 {message}',
+    infoMessage: '💡 {message}'
   }
 };
 ```
@@ -257,11 +338,13 @@ const options = {
    - Use consistent button layouts
    - Provide clear navigation paths
    - Include helpful error messages
+   - Use message helpers for consistent formatting
 
 4. **Performance**
    - Optimize module loading
    - Use appropriate pagination settings
    - Cache frequently used data
+   - Enable session support for user data
 
 ## API Reference
 
@@ -279,6 +362,15 @@ showModuleHelp(ctx: Context, moduleName: string): Promise<void>
 setupHandlers(): TeleFlex
 registerModule(moduleName: string, helpText: string): TeleFlex
 unregisterModule(moduleName: string): boolean
+```
+
+#### New Methods
+```typescript
+sendSuccess(ctx: Context, message: string): Promise<void>
+sendError(ctx: Context, message: string): Promise<void>
+sendInfo(ctx: Context, message: string): Promise<void>
+createWebAppButton(text: string, url: string): InlineKeyboardButton
+createInlineKeyboard(buttons: ButtonConfig[]): InlineKeyboardMarkup
 ```
 
 #### Navigation Methods
@@ -299,7 +391,7 @@ onModuleSelect(moduleName: string, callback: (ctx: Context) => Promise<void>): T
 
 ## Examples
 
-### Basic Bot
+### Basic Bot with New Features
 ```javascript
 const { Telegraf } = require('telegraf');
 const TeleFlex = require('teleflex');
@@ -308,43 +400,39 @@ const path = require('path');
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const teleflex = new TeleFlex(bot, {
   modulesPath: path.join(__dirname, 'modules'),
-  theme: 'modern'
+  theme: 'modern',
+  enableSession: true,
+  enableWebApp: true
 });
 
-bot.command('start', (ctx) => {
-  teleflex.sendStartMessage(ctx, 'Welcome to my bot!', {
-    buttons: [
-      { text: 'Help', callback_data: 'show:help' },
-      { text: 'Website', url: 'https://example.com' }
-    ],
-    columns: 2
+bot.command('start', async (ctx) => {
+  const webAppButton = teleflex.createWebAppButton('Open App', 'https://your-app.com');
+  const keyboard = teleflex.createInlineKeyboard([
+    webAppButton,
+    { text: 'Help', callback_data: 'show:help' },
+    { text: 'Website', url: 'https://example.com' }
+  ]);
+
+  await ctx.reply('Welcome to my bot!', {
+    reply_markup: keyboard
   });
 });
 
 bot.command('help', (ctx) => teleflex.showHelpMenu(ctx));
+
+// Handle Web App data
+bot.on('web_app_data', async (ctx) => {
+  const data = ctx.update.message.web_app_data.data;
+  try {
+    const parsedData = JSON.parse(data);
+    await teleflex.sendSuccess(ctx, 'Data received!');
+  } catch (error) {
+    await teleflex.sendError(ctx, 'Invalid data format');
+  }
+});
+
 teleflex.setupHandlers();
 bot.launch();
-```
-
-### Weather Module
-```javascript
-// modules/weather.js
-const MODULE = 'Weather';
-const HELP = 'Use /weather <city> to get weather information';
-
-async function weatherCommand(ctx) {
-  const city = ctx.message.text.split(' ')[1];
-  if (!city) {
-    return ctx.reply('Please provide a city name: /weather London');
-  }
-  await ctx.reply(`Weather forecast for ${city}...`);
-}
-
-module.exports = {
-  MODULE,
-  HELP,
-  weatherCommand
-};
 ```
 
 ## Troubleshooting
@@ -365,6 +453,16 @@ module.exports = {
    - Check bot permissions
    - Verify message age
    - Handle edit exceptions
+
+4. **Web App Issues**
+   - Verify Web App URL
+   - Check bot settings in @BotFather
+   - Handle Web App data properly
+
+5. **Session Problems**
+   - Enable session support
+   - Check session middleware
+   - Handle session errors
 
 ### Debug Tips
 

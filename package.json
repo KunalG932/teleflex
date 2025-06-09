@@ -1,6 +1,6 @@
 {
     "name": "teleflex",
-    "version": "2.0.2",
+    "version": "2.1.0",
     "publishConfig": {
         "access": "public"
     },
@@ -22,12 +22,13 @@
         "bot",
         "menu",
         "help",
-        "pagination"
+        "pagination",
+        "webapp",
+        "session"
     ],
     "author": "Kunal Gaikwad",
     "license": "MIT",
     "dependencies": {
-        "teleflex": "^2.0.1",
         "telegraf": "^4.16.3"
     },
     "devDependencies": {
