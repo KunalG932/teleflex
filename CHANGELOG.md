@@ -2,6 +2,28 @@
 
 All notable changes to the "teleflex" package will be documented in this file.
 
+
+## [2.1.0] - 2024-06-09
+
+### Added
+- Support for Telegram Web Apps with new `createWebAppButton` method
+- Enhanced inline keyboard support with `createInlineKeyboard` method
+- New message helper methods: `sendSuccess`, `sendError`, and `sendInfo`
+- Session support with `enableSession` option
+- New theme properties for better text formatting
+- Additional emoji support for success, error, and info messages
+- Updated dependencies to their latest versions
+
+### Changed
+- Updated Telegraf dependency to version 4.15.3
+- Improved type definitions for better TypeScript support
+- Enhanced theme system with more formatting options
+
+### Fixed
+- Type definitions for theme configurations
+- Improved error handling for callback queries
+
+
 ## [2.0.2] - 2025-05-06
 
 ### Added
