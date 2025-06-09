@@ -3,7 +3,7 @@
 All notable changes to the "teleflex" package will be documented in this file.
 
 
-## [2.1.0] - 2024-06-09
+## [2.1.0] - 2025-06-09
 
 ### Added
 - Support for Telegram Web Apps with new `createWebAppButton` method
